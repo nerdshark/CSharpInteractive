@@ -8,6 +8,12 @@ using MonoDevelop.Components.Commands;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
+using MonoDevelop.Core.Assemblies;
+using MonoDevelop.Core.ProgressMonitoring;
+using System.IO;
+using MonoDevelop.Projects;
+using MonoDevelop.Projects.Formats.MSBuild;
+using MonoDevelop.Components.Extensions;
 
 namespace CSharpInteractive
 {
@@ -94,7 +100,49 @@ namespace CSharpInteractive
 	{
 		public override string GetFileName ()
 		{
+			LoggingService.LogDebug ("In CSharpInteractiveSession::GetFileName");
+			string csharpReplPath = "";
+			IEnumerable<string> toolsPaths = null;
+			var targetRuntime = IdeApp.Workspace.ActiveRuntime;
+			var targetFramework = IdeApp.Services.ProjectService.DefaultTargetFramework;
+			if (targetRuntime == null)
+				LoggingService.LogDebug ("\ttargetRuntime is null");
+			if (targetFramework == null)
+				LoggingService.LogDebug ("\ttargetFramework is null");
+			if (targetRuntime != null && targetFramework != null) toolsPaths = targetRuntime.GetToolsPaths (targetFramework);
+			if (toolsPaths == null)
+				return "toolsPaths is null";
+			if (!toolsPaths.Any ()) throw new Exception("no toolpaths found");
+			foreach (var toolPath in toolsPaths) {
+				var possiblePath = Path.Combine (toolPath, "csharp");
+				if (File.Exists (possiblePath))
+					return possiblePath;
+
+			}
+			var paths = "";
+			foreach (var toolPath in toolsPaths)
+				paths += "\t" + toolPath + Environment.NewLine;
+			LoggingService.LogDebug ("\tPaths searched:\n" + paths);
+			if (String.IsNullOrEmpty (csharpReplPath)) csharpReplPath = "<not found>";
+			LoggingService.LogDebug ("\tcsharpReplPath: " + csharpReplPath);
+			return csharpReplPath;
+
+			/*
+			if (IdeApp.Workspace.IsOpen)
+			{
+
+				//var targetFramework = IdeApp.Services.ProjectService.DefaultTargetFramework;
+
+			}
+			else {
+
+			}
+
+			//var currentRuntime = Runtime.SystemAssemblyService.CurrentRuntime;
+			//var myRuntime = MonoDevelop.Projects.cu
+			//currentRuntime.GetToolPath (MonoDevelop.Core.sys);
 			return "/Library/Frameworks/Mono.framework/Versions/Current/bin/csharp";
+			*/
 		}
 	}	
 }
