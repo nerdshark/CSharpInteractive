@@ -3,10 +3,10 @@
 	namespace="CSharpInteractive" 
 	id="CSharpInteractive" 
 	name="C# Interactive" 
-	author="Frank A. Krueger" 
-	copyright="2013 Frank A. Krueger" 
+	author="Frank A. Krueger, Dustin Mays" 
+	copyright="MIT" 
 	description="C# Interactive" 
-	category="IDE extensions" 
+	category="IDE Extensions" 
 	version="1.0">
 
 	<Dependencies>
